@@ -10,46 +10,52 @@ char* expand_ps1(char *ps1) {
     char *cursor = expanded_ps1;
     char *user = getenv("USER");
     char hostname[256];
-    gethostname(hostname, sizeof(hostname)); // Get hostname
+    gethostname(hostname, sizeof(hostname));
     char cwd[256];
-    getcwd(cwd, sizeof(cwd)); // Get current directory
-    char *home = getenv("HOME"); // Get HOME directory
+    getcwd(cwd, sizeof(cwd));
+    char *home = getenv("HOME");
+
+    char *last_folder = strrchr(cwd, '/');
+    if (last_folder) {
+        last_folder++;
+    } else {
+        last_folder = cwd;
+    }
 
     for (int i = 0; ps1[i] != '\0'; i++) {
         if (ps1[i] == '\\' && ps1[i + 1] != '\0') {
             switch (ps1[i + 1]) {
                 case 'u':
-                    cursor += sprintf(cursor, "%s", user);  // Insert username
-                    i++; // Skip over 'u'
+                    cursor += sprintf(cursor, "%s", user);
+                    i++;
                     break;
                 case 'h':
-                    cursor += sprintf(cursor, "%s", hostname);  // Insert hostname
-                    i++; // Skip over 'h'
+                    cursor += sprintf(cursor, "%s", hostname);
+                    i++;
                     break;
                 case 'W':
-                    // If cwd is equal to HOME, use ~ instead
                     if (home && strcmp(cwd, home) == 0) {
-                        cursor += sprintf(cursor, "~");  // Use ~ for $HOME
+                        cursor += sprintf(cursor, "~");
                     } else {
-                        cursor += sprintf(cursor, "%s", cwd);  // Insert current directory
+                        cursor += sprintf(cursor, "%s", last_folder);
                     }
-                    i++; // Skip over 'W'
+                    i++;
                     break;
                 case '$':
                     if (getuid() == 0) {
-                        cursor += sprintf(cursor, "#");  // Root user, use #
+                        cursor += sprintf(cursor, "#");
                     } else {
-                        cursor += sprintf(cursor, "$");  // Normal user, use $
+                        cursor += sprintf(cursor, "$");
                     }
-                    i++; // Skip over '$'
+                    i++;
                     break;
                 default:
-                    *cursor++ = ps1[i];  // Just copy the character if no match
+                    *cursor++ = ps1[i];
             }
         } else {
-            *cursor++ = ps1[i];  // Copy the character if no escape
+            *cursor++ = ps1[i];
         }
     }
-    *cursor = '\0'; // Null-terminate the string
+    *cursor = '\0';
     return expanded_ps1;
 }

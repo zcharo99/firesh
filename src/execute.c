@@ -32,7 +32,6 @@ int firesh_num_builtins() {
 int firesh_cd(char **args)
 {
   if (args[1] == NULL) {
-    // No argument, get the HOME environment variable
     char *home = getenv("HOME");
     if (home == NULL) {
       fprintf(stderr, "firesh: HOME not set\n");
@@ -42,7 +41,6 @@ int firesh_cd(char **args)
       }
     }
   } else {
-    // Change to the directory specified in args[1]
     if (chdir(args[1]) != 0) {
       perror("firesh");
     }

@@ -12,19 +12,18 @@ void firesh_loop(void)
     char **args;
     int status;
 
-    firesh_source_rc(); // Load rc file before interactive shell
+    firesh_source_rc(); 
 
     do {
-        char *ps1 = getenv("PS1"); // Get PS1 from env
+        char *ps1 = getenv("PS1"); 
         if (!ps1) {
-            ps1 = "\\W \\$ "; // Fallback to default PS1 format
+            ps1 = "\\W \\$ "; 
         }
-
-        // Expand PS1 dynamically
+        
         char *expanded_ps1 = expand_ps1(ps1);
 
-        printf("%s", expanded_ps1); // Print the expanded prompt
-        fflush(stdout); // Ensure it prints immediately
+        printf("%s", expanded_ps1);
+        fflush(stdout); 
 
         line = firesh_read_line();
         args = firesh_split_line(line);
@@ -35,8 +34,7 @@ void firesh_loop(void)
     } while (status);
 }
 
-
 int main(int argc, char **argv) {
-  firesh_loop(); // Start the interactive shell loop
+  firesh_loop();
   return 0;
 }

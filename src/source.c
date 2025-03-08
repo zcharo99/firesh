@@ -18,7 +18,7 @@ void firesh_source_rc() {
         // File doesn't exist, create it with default PS1
         FILE *new_rc = fopen(rc_file, "w");
         if (new_rc) {
-            fprintf(new_rc, "PS1='\\W \\$ '\n"); // Default dynamic prompt
+            fprintf(new_rc, "PS1=\\W \\$ "); // Default dynamic prompt
             fclose(new_rc);
             printf("Created default ~/.firerc\n");
         }

@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/utsname.h>
+#include <string.h>
 
 char* expand_ps1(char *ps1) {
     static char expanded_ps1[512];
@@ -11,6 +13,7 @@ char* expand_ps1(char *ps1) {
     gethostname(hostname, sizeof(hostname)); // Get hostname
     char cwd[256];
     getcwd(cwd, sizeof(cwd)); // Get current directory
+    char *home = getenv("HOME"); // Get HOME directory
 
     for (int i = 0; ps1[i] != '\0'; i++) {
         if (ps1[i] == '\\' && ps1[i + 1] != '\0') {
@@ -24,7 +27,12 @@ char* expand_ps1(char *ps1) {
                     i++; // Skip over 'h'
                     break;
                 case 'W':
-                    cursor += sprintf(cursor, "%s", cwd);  // Insert current directory
+                    // If cwd is equal to HOME, use ~ instead
+                    if (home && strcmp(cwd, home) == 0) {
+                        cursor += sprintf(cursor, "~");  // Use ~ for $HOME
+                    } else {
+                        cursor += sprintf(cursor, "%s", cwd);  // Insert current directory
+                    }
                     i++; // Skip over 'W'
                     break;
                 case '$':

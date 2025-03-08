@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 // func for builtin commands
 int firesh_cd(char **args);
@@ -31,8 +32,17 @@ int firesh_num_builtins() {
 int firesh_cd(char **args)
 {
   if (args[1] == NULL) {
-    fprintf(stderr, "firesh: expected argument to \"cd\"\n");
+    // No argument, get the HOME environment variable
+    char *home = getenv("HOME");
+    if (home == NULL) {
+      fprintf(stderr, "firesh: HOME not set\n");
+    } else {
+      if (chdir(home) != 0) {
+        perror("firesh");
+      }
+    }
   } else {
+    // Change to the directory specified in args[1]
     if (chdir(args[1]) != 0) {
       perror("firesh");
     }

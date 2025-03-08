@@ -18,11 +18,15 @@ void firesh_source_rc() {
         // File doesn't exist, create it with default PS1
         FILE *new_rc = fopen(rc_file, "w");
         if (new_rc) {
-            fprintf(new_rc, "# \\W = current short dir\n# \\h = hostname\n # \\u = user\n# \\$ = root or normal user\n\nPS1=\\W \\$ "); // Default dynamic prompt
+            fprintf(new_rc, "# \\W = current short dir\n");
+            fprintf(new_rc, "# \\h = hostname\n");
+            fprintf(new_rc, "# \\u = user\n");
+            fprintf(new_rc, "# \\$ = root or normal user\n\n");
+            fprintf(new_rc, "PS1=\\W \\$ \n"); // Default dynamic prompt with newline
             fclose(new_rc);
-            printf("Created default ~/.firerc\n");
+            // Removed debug print: printf("Created default ~/.firerc\n");
         } else {
-            perror("Error creating ~/.firerc");  // Handle file creation error
+            perror("Error creating ~/.firerc");  // Keep this error message as it's important
             return;
         }
     }
@@ -52,8 +56,22 @@ void firesh_source_rc() {
 
             setenv("PS1", new_ps1, 1); // Set as environment variable
         } else {
-            // If it's not PS1, execute other commands in the rc file
-            firesh_execute(firesh_split_line(line)); // Assuming firesh_execute and firesh_split_line are correctly implemented
+            // Skip comments and empty lines
+            char *trimmed = line;
+            while (*trimmed == ' ' || *trimmed == '\t') trimmed++; // Skip leading whitespace
+            
+            // Skip empty lines and comments
+            if (*trimmed != '\0' && *trimmed != '#' && *trimmed != '\n') {
+                // Remove trailing newline
+                trimmed[strcspn(trimmed, "\n")] = 0;
+                
+                // Only execute non-empty commands
+                if (strlen(trimmed) > 0) {
+                    char **args = firesh_split_line(trimmed);
+                    firesh_execute(args);
+                    free(args); // Free the allocated memory for args
+                }
+            }
         }
     }
 

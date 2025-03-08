@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -13,31 +12,19 @@ void firesh_loop(void)
     char **args;
     int status;
 
-    firesh_source_rc();
+    firesh_source_rc(); // Load rc file before interactive shell
 
     do {
-        char *user = getenv("USER");
-        char hostname[256];
-        gethostname(hostname, sizeof(hostname));
-
-        char *ps1 = getenv("PS1");
+        char *ps1 = getenv("PS1"); // Get PS1 from env
         if (!ps1) {
-            ps1 = "\\W \\$ ";
+            ps1 = "\\u@\\h \\W$ "; // Fallback to default PS1 format
         }
 
-        char ps1_final[512];
-        snprintf(ps1_final, sizeof(ps1_final), ps1, user, hostname);
+        // Expand PS1 dynamically
+        char *expanded_ps1 = expand_ps1(ps1);
 
-        if (getuid() == 0) {
-            char *root_ps1 = strdup(ps1_final);
-            root_ps1[strlen(root_ps1) - 1] = '#';
-            ps1 = root_ps1;
-        } else {
-            ps1[strlen(ps1) - 1] = '$';
-        }
-
-        printf("%s", ps1);
-        fflush(stdout);
+        printf("%s", expanded_ps1); // Print the expanded prompt
+        fflush(stdout); // Ensure it prints immediately
 
         line = firesh_read_line();
         args = firesh_split_line(line);
@@ -47,6 +34,7 @@ void firesh_loop(void)
         free(args);
     } while (status);
 }
+
 
 int main(int argc, char **argv) {
   firesh_loop(); // Start the interactive shell loop

@@ -17,7 +17,7 @@ void firesh_loop(void)
     do {
         char *ps1 = getenv("PS1"); // Get PS1 from env
         if (!ps1) {
-            ps1 = "\\u@\\h \\W$ "; // Fallback to default PS1 format
+            ps1 = "\\W \\$ "; // Fallback to default PS1 format
         }
 
         // Expand PS1 dynamically

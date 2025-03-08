@@ -31,29 +31,20 @@ int firesh_num_builtins() {
 // implementation for cd
 int firesh_cd(char **args)
 {
-  char cwd[1024];
-  if (getcwd(cwd, sizeof(cwd)) != NULL) {
-    printf("Current directory: %s\n", cwd);  // Debug print
-  } else {
-    perror("getcwd");  // If getcwd fails
-  }
-
   if (args[1] == NULL) {
     // No argument, get the HOME environment variable
     char *home = getenv("HOME");
     if (home == NULL) {
       fprintf(stderr, "firesh: HOME not set\n");
     } else {
-      printf("Changing to home directory: %s\n", home);  // Debug print
       if (chdir(home) != 0) {
-        perror("firesh");  // This will print the error message if chdir fails
+        perror("firesh");
       }
     }
   } else {
     // Change to the directory specified in args[1]
-    printf("Changing to directory: %s\n", args[1]);  // Debug print
     if (chdir(args[1]) != 0) {
-      perror("firesh");  // This will print the error message if chdir fails
+      perror("firesh");
     }
   }
   return 1;

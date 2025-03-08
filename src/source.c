@@ -5,46 +5,58 @@
 #include <sys/stat.h>
 #include "main.h"
 
-int firesh_cd(char **args)
-{
-    char cwd[1024];
+void firesh_source_rc() {
+    const char *rc_path = getenv("HOME"); // Get home directory
+    if (!rc_path) return; // Fail silently if HOME is not set
 
-    // Check current working directory before any action
-    if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        printf("Current directory: %s\n", cwd);  // Debug print
-    } else {
-        perror("getcwd");
-    }
+    char rc_file[1024]; // Buffer size increased for safety
+    snprintf(rc_file, sizeof(rc_file), "%s/.firerc", rc_path); // ~/.firerc
 
-    // If no arguments are passed to `cd`, change to $HOME
-    if (args[1] == NULL) {
-        char *home = getenv("HOME");
-        if (home == NULL) {
-            fprintf(stderr, "firesh: HOME not set\n");
+    // Check if ~/.firerc exists
+    struct stat buffer;
+    if (stat(rc_file, &buffer) != 0) {
+        // File doesn't exist, create it with default PS1
+        FILE *new_rc = fopen(rc_file, "w");
+        if (new_rc) {
+            fprintf(new_rc, "# \\W = current short dir\n# \\h = hostname\n # \\u = user\n# \\$ = root or normal user\n\nPS1=\\W \\$ "); // Default dynamic prompt
+            fclose(new_rc);
+            printf("Created default ~/.firerc\n");
         } else {
-            // Check if the HOME directory exists before trying to chdir
-            if (access(home, F_OK) == 0) {
-                printf("Changing to home directory: %s\n", home);  // Debug print
-                if (chdir(home) != 0) {
-                    perror("firesh");  // Handle chdir failure
-                }
-            } else {
-                fprintf(stderr, "firesh: %s: No such directory\n", home);
-            }
-        }
-    } else {
-        // If there's an argument, try to change to that directory
-        printf("Changing to directory: %s\n", args[1]);  // Debug print
-
-        // Check if the directory exists before trying to change
-        if (access(args[1], F_OK) == 0) {
-            if (chdir(args[1]) != 0) {
-                perror("firesh");  // Handle chdir failure
-            }
-        } else {
-            fprintf(stderr, "firesh: %s: No such directory\n", args[1]);
+            perror("Error creating ~/.firerc");  // Handle file creation error
+            return;
         }
     }
 
-    return 1;
+    // Open ~/.firerc for reading
+    FILE *file = fopen(rc_file, "r");
+    if (!file) {
+        perror("Error opening ~/.firerc");
+        return; // If we can't open the file, return early
+    }
+
+    char *line = NULL;
+    size_t len = 0;
+
+    while (getline(&line, &len, file) != -1) {
+        // Check if line starts with PS1=
+        if (strncmp(line, "PS1=", 4) == 0) {
+            char *new_ps1 = line + 4; // Get value after "PS1="
+            new_ps1[strcspn(new_ps1, "\n")] = 0; // Remove trailing newline
+
+            // Optionally, validate or sanitize PS1 before setting it
+            // For example, ensure there are no malicious characters
+            if (new_ps1[0] == '\0') {
+                fprintf(stderr, "Warning: Empty PS1 value in ~/.firerc\n");
+                continue; // Skip empty PS1 values
+            }
+
+            setenv("PS1", new_ps1, 1); // Set as environment variable
+        } else {
+            // If it's not PS1, execute other commands in the rc file
+            firesh_execute(firesh_split_line(line)); // Assuming firesh_execute and firesh_split_line are correctly implemented
+        }
+    }
+
+    free(line);
+    fclose(file);
 }

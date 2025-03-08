@@ -44,12 +44,12 @@ int firesh_cd(char **args)
 int firesh_help(char **args)
 {
   int i;
-  printf("zChar's firesh\n");
-  printf("Type program names and arguments, and hit enter.\n");
-  printf("The following commands are built in:\n");
+  printf("    zChar's firesh\n");
+  printf("    Type program names and arguments, and hit enter.\n");
+  printf("    The following commands are built in:\n");
 
   for (i = 0; i < firesh_num_builtins(); i++) {
-    printf("  %s\n", builtin_str[i]);
+    printf("      %s\n", builtin_str[i]);
   }
 
   printf("Use the man command (if you have it installed) for information on other programs.\n");

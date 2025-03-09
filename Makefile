@@ -18,6 +18,12 @@ all: $(TARGET)
 $(TARGET): $(OBJ)
 	$(CC) $(LDFLAGS) -o $@ $^
 
+debug: CFLAGS += -g
+debug: all
+
+install: all
+	sudo cp $(TARGET) /usr/local/bin/
+
 build/%.o: src/%.c | build
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -27,4 +33,4 @@ build:
 clean:
 	rm -rf build $(TARGET)
 
-.PHONY: all clean
+.PHONY: all debug install clean

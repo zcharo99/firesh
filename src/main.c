@@ -28,7 +28,8 @@ void firesh_loop(void)
 
         // Use the enhanced line reading function with arrow key support
         line = firesh_read_line_with_editing();
-        args = firesh_split_line(line);
+        char *expanded_line = expand_variables(line);
+        args = firesh_split_line(expanded_line);
         status = firesh_execute(args);
 
         free(line);

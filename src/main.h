@@ -9,5 +9,6 @@ void firesh_source_rc();
 char *expand_ps1(char *ps1);
 char *firesh_read_line_with_editing(void);
 void cleanup_history(void);
+char *expand_variables(char *line);
 
 #endif

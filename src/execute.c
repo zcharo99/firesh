@@ -120,6 +120,8 @@ int firesh_execute(char **args)
     return 1;
   }
 
+  char *expanded_command = expand_variables(args[0]);
+
   // idk what this does tbh
   for (i = 0; i < firesh_num_builtins(); i++) {
     if (strcmp(args[0], builtin_str[i]) == 0) {

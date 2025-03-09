@@ -9,6 +9,7 @@
 void firesh_loop(void)
 {
     char *line;
+
     char **args;
     int status;
 
@@ -25,13 +26,17 @@ void firesh_loop(void)
         printf("%s", expanded_ps1);
         fflush(stdout); 
 
-        line = firesh_read_line();
+        // Use the enhanced line reading function with arrow key support
+        line = firesh_read_line_with_editing();
         args = firesh_split_line(line);
         status = firesh_execute(args);
 
         free(line);
         free(args);
     } while (status);
+    
+    // Clean up history when exiting
+    cleanup_history();
 }
 
 int main(int argc, char **argv) {

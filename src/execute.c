@@ -8,19 +8,22 @@
 int firesh_cd(char **args);
 int firesh_help(char **args);
 int firesh_exit(char **args);
+int firesh_export(char **args);
 
 // array of builtin commands
 char *builtin_str[] = {
   "cd",
   "help",
-  "exit"
+  "exit",
+  "export"
 };
 
 // associate it to the functions
 int (*builtin_func[]) (char **) = {
   &firesh_cd,
   &firesh_help,
-  &firesh_exit
+  &firesh_exit,
+  &firesh_export
 };
 
 // number of builtins
@@ -61,6 +64,43 @@ int firesh_help(char **args)
   }
 
   printf("Use the man command (if you have it installed) for information on other programs.\n");
+  return 1;
+}
+
+// implementation for export
+int firesh_export(char **args)
+{
+  if (args[1] == NULL) {
+    // If no arguments, list all environment variables
+    extern char **environ;
+    for (char **env = environ; *env != NULL; env++) {
+      printf("%s\n", *env);
+    }
+    return 1;
+  }
+
+  // Handle export VAR=VALUE format
+  char *equals_sign = strchr(args[1], '=');
+  if (equals_sign) {
+    // Split the string at the equals sign
+    *equals_sign = '\0';
+    char *name = args[1];
+    char *value = equals_sign + 1;
+    
+    // Set the environment variable
+    if (setenv(name, value, 1) != 0) {
+      perror("firesh: export");
+    }
+  } else {
+    // If no equals sign, just print the value of that variable
+    char *value = getenv(args[1]);
+    if (value) {
+      printf("%s=%s\n", args[1], value);
+    } else {
+      printf("%s: not set\n", args[1]);
+    }
+  }
+  
   return 1;
 }
 

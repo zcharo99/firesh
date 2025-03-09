@@ -49,9 +49,22 @@ char* expand_ps1(char *ps1) {
                     }
                     i++;
                     break;
+                case 'n':
+                    cursor += sprintf(cursor, "\n");
+                    i++;
+                    break;
+                case '"':
+                case '\'':
+                    // Ignore quotes by skipping the backslash
+                    *cursor++ = ps1[i+1];
+                    i++;
+                    break;
                 default:
                     *cursor++ = ps1[i];
             }
+        } else if (ps1[i] == '"' || ps1[i] == '\'') {
+            // Ignore quotes without backslashes
+            continue;
         } else {
             *cursor++ = ps1[i];
         }

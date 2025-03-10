@@ -20,7 +20,8 @@ void firesh_source_rc() {
             fprintf(new_rc, "# \\W = current short dir\n");
             fprintf(new_rc, "# \\h = hostname\n");
             fprintf(new_rc, "# \\u = user\n");
-            fprintf(new_rc, "# \\$ = root or normal user\n\n");
+            fprintf(new_rc, "# \\$ = root or normal user\n");
+            fprintf(new_rc, "# \\w = full path but replace home with ~\n\n");
             fprintf(new_rc, "PS1=\\W \\$ \n"); 
             fclose(new_rc);
             

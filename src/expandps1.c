@@ -41,6 +41,18 @@ char* expand_ps1(char *ps1) {
                     }
                     i++;
                     break;
+                case 'w':
+                    if (home && strncmp(cwd, home, strlen(home)) == 0) {
+                        if (strlen(home) == 1) {
+                            cursor += sprintf(cursor, "~");
+                        } else {
+                            cursor += sprintf(cursor, "~%s", cwd + strlen(home));
+                        }
+                    } else {
+                        cursor += sprintf(cursor, "%s", cwd);
+                    }
+                    i++;
+                    break;
                 case '$':
                     if (getuid() == 0) {
                         cursor += sprintf(cursor, "#");
